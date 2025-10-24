@@ -236,7 +236,7 @@ const App = () => {
   const VistaAdmin = () => (
     <div className="space-y-6">
       <div className="flex justify-between items-center flex-wrap gap-4">
-        <h2 className="text-2xl font-bold text-gray-800">Panel de Administración</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Hola bebe hemosa Te Amooo</h2>
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={cargarPartidosAutomatico}
