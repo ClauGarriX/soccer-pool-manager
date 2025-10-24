@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Download, Users, Settings, Send, Bell, Share2, Trophy, RefreshCw, Zap } from 'lucide-react';
+import { Download, Users, Settings, Send, Bell, Share2, Trophy, RefreshCw, Zap, LogOut } from 'lucide-react';
 import { db } from './config/firebase';
 import { collection, addDoc, getDocs, doc, setDoc, getDoc, query, orderBy } from 'firebase/firestore';
+import PinLogin from './components/PinLogin';
 
 const App = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [view, setView] = useState('admin');
   const [partidos, setPartidos] = useState([]);
   const [quinielas, setQuinielas] = useState([]);
@@ -15,20 +17,34 @@ const App = () => {
   const [cargandoPartidos, setCargandoPartidos] = useState(false);
 
   useEffect(() => {
-    loadData();
     detectarModoCliente();
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated || view === 'cliente') {
+      loadData();
+    }
+  }, [isAuthenticated, view]);
 
   const detectarModoCliente = () => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('modo') === 'cliente') {
       setView('cliente');
+      setIsAuthenticated(true); // Los clientes no necesitan PIN
     }
+  };
+
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setView('admin');
   };
 
   const loadData = async () => {
     try {
-      // Cargar configuración
       const configDoc = await getDoc(doc(db, 'config', 'general'));
       if (configDoc.exists()) {
         const data = configDoc.data();
@@ -36,7 +52,6 @@ const App = () => {
         setWebhookUrl(data.webhookUrl || '');
       }
 
-      // Cargar partidos
       const partidosSnapshot = await getDocs(collection(db, 'partidos'));
       const partidosData = partidosSnapshot.docs.map(doc => ({
         id: doc.id,
@@ -44,7 +59,6 @@ const App = () => {
       }));
       setPartidos(partidosData);
 
-      // Cargar quinielas
       const quinielasQuery = query(collection(db, 'quinielas'), orderBy('timestamp', 'desc'));
       const quinielasSnapshot = await getDocs(quinielasQuery);
       const quinielasData = quinielasSnapshot.docs.map(doc => ({
@@ -59,11 +73,7 @@ const App = () => {
 
   const savePartidos = async (nuevosPartidos) => {
     try {
-      // Eliminar partidos anteriores y agregar nuevos
       setPartidos(nuevosPartidos);
-      
-      // Aquí podrías implementar lógica para actualizar Firestore
-      // Por ahora solo actualizamos el estado local
       mostrarNotificacion('Partidos actualizados');
     } catch (e) {
       console.error('Error guardando partidos:', e);
@@ -253,6 +263,13 @@ const App = () => {
           >
             <Download size={18} />
             Exportar Excel
+          </button>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-600"
+          >
+            <LogOut size={18} />
+            Salir
           </button>
         </div>
       </div>
@@ -508,6 +525,11 @@ const App = () => {
       </div>
     );
   };
+
+  // Si no está autenticado y está en modo admin, mostrar login
+  if (!isAuthenticated && view === 'admin') {
+    return <PinLogin onSuccess={handleLoginSuccess} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-8 px-4">
