@@ -26,7 +26,7 @@ const PinLogin = ({ onSuccess }) => {
         const pinCorrecto = configDoc.data().pinAdmin;
         
         if (pin.toUpperCase() === pinCorrecto.toUpperCase()) {
-          onSuccess();
+          await onSuccess(pin);
         } else {
           setError('PIN incorrecto');
           setPin('');
