@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Target, Clock, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Target, Clock, AlertTriangle } from 'lucide-react';
 import useParticipantes from '../hooks/useParticipantes';
 import QuinielaForm from '../components/public/QuinielaForm';
 import ConfirmationModal from '../components/public/ConfirmationModal';
@@ -211,60 +211,54 @@ const QuinielaPublicPage = () => {
 
   // Formulario principal
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50" style={{ WebkitTapHighlightColor: 'transparent' }}>
+      <div className="max-w-3xl mx-auto px-4 py-6 sm:py-8">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-xl p-8 mb-8 text-white">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="bg-white/20 p-3 rounded-lg">
-              <Target size={32} />
-            </div>
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold">{quiniela.nombre}</h1>
-              {quiniela.descripcion && (
-                <p className="text-white/90 mt-2">{quiniela.descripcion}</p>
-              )}
-            </div>
-          </div>
+        <div className="relative overflow-hidden rounded-2xl shadow-2xl mb-6">
+          {/* Background con gradiente azul oscuro y plateado */}
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-700 via-blue-900 to-slate-800"></div>
 
-          {/* Contador de tiempo restante */}
-          {tiempoRestante && (tiempoRestante.dias > 0 || tiempoRestante.horas > 0 || tiempoRestante.minutos > 0) && (
-            <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 mt-4">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Clock size={20} />
-                <span className="font-semibold">Tiempo restante para participar:</span>
+          {/* Glassmorphism overlay optimizado */}
+          <div className="glass-header relative backdrop-blur-sm bg-white/10 p-5 sm:p-8 text-white">
+            <div className="flex items-center gap-3 sm:gap-4 mb-4">
+              <div className="glass-icon bg-white/15 p-2.5 sm:p-3 rounded-xl border border-white/20">
+                <Target size={28} className="sm:w-8 sm:h-8 drop-shadow-lg" />
               </div>
-              <div className="flex justify-center gap-4 text-center">
-                {tiempoRestante.dias > 0 && (
-                  <div>
-                    <div className="text-3xl font-bold">{tiempoRestante.dias}</div>
-                    <div className="text-sm text-white/80">
-                      {tiempoRestante.dias === 1 ? 'día' : 'días'}
-                    </div>
-                  </div>
+              <div className="flex-1 min-w-0">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight drop-shadow-md">{quiniela.nombre}</h1>
+                {quiniela.descripcion && (
+                  <p className="text-white/95 mt-1.5 sm:mt-2 text-sm sm:text-base drop-shadow-sm">{quiniela.descripcion}</p>
                 )}
-                <div>
-                  <div className="text-3xl font-bold">{tiempoRestante.horas}</div>
-                  <div className="text-sm text-white/80">horas</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold">{tiempoRestante.minutos}</div>
-                  <div className="text-sm text-white/80">minutos</div>
-                </div>
               </div>
             </div>
-          )}
 
-          {/* Estadísticas */}
-          <div className="flex items-center justify-center gap-6 mt-6 text-sm">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 size={18} />
-              <span>{quiniela.respuestas || 0} participantes</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Target size={18} />
-              <span>{quiniela.partidos?.length || 0} partidos</span>
-            </div>
+            {/* Contador de tiempo restante */}
+            {tiempoRestante && (tiempoRestante.dias > 0 || tiempoRestante.horas > 0 || tiempoRestante.minutos > 0) && (
+              <div className="glass-timer bg-white/15 backdrop-blur-md rounded-xl p-3.5 sm:p-4 border border-white/20">
+                <div className="flex items-center justify-center gap-2 mb-2.5">
+                  <Clock size={18} className="sm:w-5 sm:h-5 drop-shadow" />
+                  <span className="font-semibold text-sm sm:text-base drop-shadow">Tiempo restante:</span>
+                </div>
+                <div className="flex justify-center gap-3 sm:gap-4 text-center">
+                  {tiempoRestante.dias > 0 && (
+                    <div className="glass-time-unit bg-white/10 rounded-lg px-3 py-2 min-w-[60px]">
+                      <div className="text-2xl sm:text-3xl font-bold drop-shadow-md">{tiempoRestante.dias}</div>
+                      <div className="text-xs sm:text-sm text-white/90 drop-shadow-sm">
+                        {tiempoRestante.dias === 1 ? 'día' : 'días'}
+                      </div>
+                    </div>
+                  )}
+                  <div className="glass-time-unit bg-white/10 rounded-lg px-3 py-2 min-w-[60px]">
+                    <div className="text-2xl sm:text-3xl font-bold drop-shadow-md">{tiempoRestante.horas}</div>
+                    <div className="text-xs sm:text-sm text-white/90 drop-shadow-sm">horas</div>
+                  </div>
+                  <div className="glass-time-unit bg-white/10 rounded-lg px-3 py-2 min-w-[60px]">
+                    <div className="text-2xl sm:text-3xl font-bold drop-shadow-md">{tiempoRestante.minutos}</div>
+                    <div className="text-xs sm:text-sm text-white/90 drop-shadow-sm">min</div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

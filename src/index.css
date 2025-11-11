@@ -99,3 +99,237 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+/* Optimizaciones para Safari y Chrome móvil */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* Prevenir zoom en inputs en iOS Safari */
+input[type="text"],
+input[type="tel"],
+input[type="email"],
+textarea,
+select {
+  font-size: 16px !important;
+}
+
+/* Mejorar scroll en iOS */
+body {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
+}
+
+/* Optimizar rendimiento de animaciones */
+.transition-all,
+.transition-transform,
+.transition-shadow {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Mejorar apariencia de botones en móviles */
+button {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  touch-action: manipulation;
+}
+
+/* Prevenir selección de texto no deseada */
+button,
+.touch-manipulation {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Mejorar sticky positioning en Safari */
+.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+}
+
+/* Optimizar gradients para Safari */
+.bg-gradient-to-r,
+.bg-gradient-to-br {
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+}
+
+/* Smooth transitions para Safari */
+@media (prefers-reduced-motion: no-preference) {
+  * {
+    -webkit-transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  }
+}
+
+/* Glassmorphism optimizado para performance */
+.glass-header {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: auto;
+}
+
+.glass-icon,
+.glass-timer {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Optimizar backdrop-filter solo donde es necesario */
+@supports (backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px)) {
+  .glass-header {
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  .glass-timer {
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+}
+
+/* Fallback para navegadores sin backdrop-filter */
+@supports not ((backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px))) {
+  .glass-header {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .glass-timer {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Micro-interacciones optimizadas (solo transform y opacity) */
+
+/* Animación de selección de predicción */
+@keyframes checkPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.prediction-selected {
+  animation: checkPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Animación de partido completado */
+@keyframes successGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+.match-completed {
+  animation: successGlow 0.6s ease-out;
+}
+
+/* Pulse sutil para botón activado */
+@keyframes gentlePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.button-ready {
+  animation: gentlePulse 2s ease-in-out infinite;
+}
+
+/* Celebration para 100% - Versión sutil */
+@keyframes celebrate {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.progress-complete {
+  animation: celebrate 0.4s ease-out;
+}
+
+/* Recordatorio sutil para nombre faltante */
+@keyframes gentleReminder {
+  0%, 100% {
+    color: rgb(107, 114, 128); /* gray-500 */
+    opacity: 1;
+  }
+  50% {
+    color: rgb(239, 68, 68); /* red-500 */
+    opacity: 0.9;
+  }
+}
+
+.name-reminder {
+  animation: gentleReminder 2s ease-in-out infinite;
+}
+
+/* Glassmorphism sutil para botones de predicción */
+.glass-button-blue,
+.glass-button-gray,
+.glass-button-green {
+  background: rgba(255, 255, 255, 0.7);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Aplicar backdrop-filter solo si es soportado */
+@supports (backdrop-filter: blur(4px)) or (-webkit-backdrop-filter: blur(4px)) {
+  .glass-button-blue {
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    background: rgba(239, 246, 255, 0.6);
+  }
+
+  .glass-button-gray {
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    background: rgba(249, 250, 251, 0.6);
+  }
+
+  .glass-button-green {
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    background: rgba(240, 253, 244, 0.6);
+  }
+}
+
+/* Fallback sin backdrop-filter */
+@supports not ((backdrop-filter: blur(4px)) or (-webkit-backdrop-filter: blur(4px))) {
+  .glass-button-blue {
+    background: rgba(239, 246, 255, 0.85);
+  }
+
+  .glass-button-gray {
+    background: rgba(249, 250, 251, 0.85);
+  }
+
+  .glass-button-green {
+    background: rgba(240, 253, 244, 0.85);
+  }
+}
