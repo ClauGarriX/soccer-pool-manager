@@ -1,5 +1,6 @@
 import React from 'react';
-import { Edit2, Trash2, Eye, EyeOff, Share2, Copy } from 'lucide-react';
+import { Edit2, Trash2, Eye, EyeOff, Share2, Copy, FileText } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const QuinielasTable = ({
   quinielas,
@@ -8,11 +9,16 @@ const QuinielasTable = ({
   onToggle,
   onShare
 }) => {
+  const navigate = useNavigate();
+
   const copiarLink = (quinielaId) => {
-    const link = `${window.location.origin}/?quiniela=${quinielaId}`;
+    const link = `${window.location.origin}/quiniela/${quinielaId}`;
     navigator.clipboard.writeText(link);
-    // Aquí podrías añadir una notificación toast
-    alert('Link copiado al portapapeles');
+    alert('Link público copiado al portapapeles');
+  };
+
+  const verDetalles = (quinielaId) => {
+    navigate(`/admin/quinielas/${quinielaId}`);
   };
 
   return (
@@ -93,9 +99,16 @@ const QuinielasTable = ({
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       <button
+                        onClick={() => verDetalles(quiniela.id)}
+                        className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                        title="Ver Detalles"
+                      >
+                        <FileText size={18} />
+                      </button>
+                      <button
                         onClick={() => copiarLink(quiniela.id)}
                         className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                        title="Compartir"
+                        title="Compartir Link Público"
                       >
                         <Copy size={18} />
                       </button>

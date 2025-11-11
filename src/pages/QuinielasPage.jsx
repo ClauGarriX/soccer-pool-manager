@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import useQuinielas from '../hooks/useQuinielas';
-import { Plus, Filter } from 'lucide-react';
+import { Plus, Filter, Zap } from 'lucide-react';
 import QuinielaModal from '../components/quinielas/QuinielaModal';
+import CrearRapidoLigaMX from '../components/quinielas/CrearRapidoLigaMX';
 import QuinielasTable from '../components/dashboard/QuinielasTable';
 
 const QuinielasPage = () => {
@@ -18,6 +19,7 @@ const QuinielasPage = () => {
   } = useQuinielas();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showRapidoModal, setShowRapidoModal] = useState(false);
   const [quinielaEditando, setQuinielaEditando] = useState(null);
   const [filtro, setFiltro] = useState('todas'); // 'todas', 'activas', 'inactivas'
 
@@ -67,6 +69,16 @@ const QuinielasPage = () => {
     }
   };
 
+  const handleConfirmarRapido = async (quinielaData) => {
+    const result = await crearQuiniela(quinielaData);
+    if (result.success) {
+      alert('Quiniela Liga MX creada correctamente');
+      setShowRapidoModal(false);
+    } else {
+      alert('Error al crear quiniela: ' + result.error);
+    }
+  };
+
   const quinielasFiltradas = () => {
     switch (filtro) {
       case 'activas':
@@ -97,13 +109,22 @@ const QuinielasPage = () => {
           <h2 className="text-3xl font-bold text-gray-800">Gestión de Quinielas</h2>
           <p className="text-gray-600 mt-1">Administra todas tus quinielas</p>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all"
-        >
-          <Plus size={20} />
-          Nueva Quiniela
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={() => setShowRapidoModal(true)}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all"
+          >
+            <Zap size={20} />
+            Creación Rápida Liga MX
+          </button>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all"
+          >
+            <Plus size={20} />
+            Nueva Quiniela Manual
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -168,12 +189,19 @@ const QuinielasPage = () => {
         onToggle={handleToggle}
       />
 
-      {/* Modal */}
+      {/* Modal Manual */}
       <QuinielaModal
         isOpen={showCreateModal}
         onClose={handleCloseModal}
         onSave={handleSaveQuiniela}
         quinielaInicial={quinielaEditando}
+      />
+
+      {/* Modal Creación Rápida Liga MX */}
+      <CrearRapidoLigaMX
+        isOpen={showRapidoModal}
+        onClose={() => setShowRapidoModal(false)}
+        onConfirm={handleConfirmarRapido}
       />
     </div>
   );

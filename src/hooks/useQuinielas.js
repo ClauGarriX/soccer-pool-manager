@@ -59,8 +59,14 @@ const useQuinielas = () => {
   // Crear quiniela
   const crearQuiniela = async (quinielaData) => {
     try {
+      // Convertir fechaLimite a Timestamp si existe y es un Date
+      const dataToSave = { ...quinielaData };
+      if (dataToSave.fechaLimite && dataToSave.fechaLimite instanceof Date) {
+        dataToSave.fechaLimite = Timestamp.fromDate(dataToSave.fechaLimite);
+      }
+
       const docRef = await addDoc(collection(db, 'quinielas_activas'), {
-        ...quinielaData,
+        ...dataToSave,
         fechaCreacion: Timestamp.now(),
         respuestas: 0,
         activa: true

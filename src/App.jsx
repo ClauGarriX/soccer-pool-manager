@@ -8,10 +8,11 @@ import QuinielasPage from './pages/QuinielasPage';
 import PagosPage from './pages/PagosPage';
 import EstadisticasPage from './pages/EstadisticasPage';
 import ConfiguracionPage from './pages/ConfiguracionPage';
+import QuinielaPublicPage from './pages/QuinielaPublicPage';
+import QuinielaDetailsPage from './pages/QuinielaDetailsPage';
 
-const App = () => {
-  const { isAuthenticated, isLoading, login, logout } = useAuth();
-
+// Componente para rutas protegidas
+const ProtectedRoute = ({ children, isAuthenticated, isLoading, login }) => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
@@ -29,7 +30,6 @@ const App = () => {
         onSuccess={async (pin) => {
           const result = await login(pin);
           if (!result.success) {
-            // El error se manejará en PinLogin
             throw new Error(result.error);
           }
         }}
@@ -37,17 +37,42 @@ const App = () => {
     );
   }
 
+  return children;
+};
+
+const App = () => {
+  const { isAuthenticated, isLoading, login, logout } = useAuth();
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Layout onLogout={logout} />}>
+        {/* Rutas públicas - NO requieren autenticación */}
+        <Route path="/quiniela/:quinielaId" element={<QuinielaPublicPage />} />
+
+        {/* Rutas de administración - SÍ requieren autenticación */}
+        <Route
+          path="/admin/*"
+          element={
+            <ProtectedRoute
+              isAuthenticated={isAuthenticated}
+              isLoading={isLoading}
+              login={login}
+            >
+              <Layout onLogout={logout} />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<DashboardPage />} />
           <Route path="quinielas" element={<QuinielasPage />} />
+          <Route path="quinielas/:quinielaId" element={<QuinielaDetailsPage />} />
           <Route path="pagos" element={<PagosPage />} />
           <Route path="estadisticas" element={<EstadisticasPage />} />
           <Route path="configuracion" element={<ConfiguracionPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
+
+        {/* Redireccionamientos */}
+        <Route path="/" element={<Navigate to="/admin" replace />} />
+        <Route path="*" element={<Navigate to="/admin" replace />} />
       </Routes>
     </BrowserRouter>
   );

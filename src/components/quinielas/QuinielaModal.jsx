@@ -3,14 +3,42 @@ import { X, Plus, Trash2, Calendar, Clock } from 'lucide-react';
 
 const QuinielaModal = ({ isOpen, onClose, onSave, quinielaInicial }) => {
   const [nombre, setNombre] = useState('');
+  const [descripcion, setDescripcion] = useState('');
+  const [fechaLimite, setFechaLimite] = useState('');
+  const [horaLimite, setHoraLimite] = useState('');
+  const [permitirEdicion, setPermitirEdicion] = useState(false);
+  const [mostrarResultados, setMostrarResultados] = useState(false);
   const [partidos, setPartidos] = useState([]);
   const [activa, setActiva] = useState(true);
 
   useEffect(() => {
     if (quinielaInicial) {
       setNombre(quinielaInicial.nombre || '');
+      setDescripcion(quinielaInicial.descripcion || '');
       setPartidos(quinielaInicial.partidos || []);
       setActiva(quinielaInicial.activa !== undefined ? quinielaInicial.activa : true);
+      setPermitirEdicion(quinielaInicial.permitirEdicion || false);
+      setMostrarResultados(quinielaInicial.mostrarResultados || false);
+
+      // Manejar fecha límite si existe
+      if (quinielaInicial.fechaLimite) {
+        try {
+          const fecha = quinielaInicial.fechaLimite.toDate ?
+            quinielaInicial.fechaLimite.toDate() :
+            new Date(quinielaInicial.fechaLimite);
+
+          const year = fecha.getFullYear();
+          const month = String(fecha.getMonth() + 1).padStart(2, '0');
+          const day = String(fecha.getDate()).padStart(2, '0');
+          const hours = String(fecha.getHours()).padStart(2, '0');
+          const minutes = String(fecha.getMinutes()).padStart(2, '0');
+
+          setFechaLimite(`${year}-${month}-${day}`);
+          setHoraLimite(`${hours}:${minutes}`);
+        } catch (error) {
+          console.error('Error al parsear fecha límite:', error);
+        }
+      }
     } else {
       resetForm();
     }
@@ -18,6 +46,11 @@ const QuinielaModal = ({ isOpen, onClose, onSave, quinielaInicial }) => {
 
   const resetForm = () => {
     setNombre('');
+    setDescripcion('');
+    setFechaLimite('');
+    setHoraLimite('');
+    setPermitirEdicion(false);
+    setMostrarResultados(false);
     setPartidos([]);
     setActiva(true);
   };
@@ -67,12 +100,23 @@ const QuinielaModal = ({ isOpen, onClose, onSave, quinielaInicial }) => {
       return;
     }
 
-    onSave({
+    // Preparar datos de quiniela
+    const quinielaData = {
       nombre: nombre.trim(),
+      descripcion: descripcion.trim(),
       partidos,
-      activa
-    });
+      activa,
+      permitirEdicion,
+      mostrarResultados
+    };
 
+    // Agregar fecha límite si fue especificada
+    if (fechaLimite && horaLimite) {
+      const fechaLimiteCompleta = new Date(`${fechaLimite}T${horaLimite}`);
+      quinielaData.fechaLimite = fechaLimiteCompleta;
+    }
+
+    onSave(quinielaData);
     resetForm();
   };
 
@@ -99,7 +143,7 @@ const QuinielaModal = ({ isOpen, onClose, onSave, quinielaInicial }) => {
           {/* Nombre */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Nombre de la Quiniela
+              Nombre de la Quiniela <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -110,20 +154,106 @@ const QuinielaModal = ({ isOpen, onClose, onSave, quinielaInicial }) => {
             />
           </div>
 
-          {/* Estado */}
-          <div className="flex items-center gap-3">
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={activa}
-                onChange={(e) => setActiva(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+          {/* Descripción */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Descripción (opcional)
             </label>
-            <span className="text-sm font-medium text-gray-700">
-              Quiniela {activa ? 'Activa' : 'Inactiva'}
-            </span>
+            <textarea
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+              placeholder="Agrega una descripción de la quiniela..."
+              rows={3}
+              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all resize-none"
+            />
+          </div>
+
+          {/* Fecha Límite */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Fecha y Hora Límite de Participación (opcional)
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="relative">
+                <Calendar size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="date"
+                  value={fechaLimite}
+                  onChange={(e) => setFechaLimite(e.target.value)}
+                  className="w-full pl-10 pr-3 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                />
+              </div>
+              <div className="relative">
+                <Clock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="time"
+                  value={horaLimite}
+                  onChange={(e) => setHoraLimite(e.target.value)}
+                  className="w-full pl-10 pr-3 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                />
+              </div>
+            </div>
+            {fechaLimite && horaLimite && (
+              <p className="mt-2 text-sm text-gray-600">
+                Los participantes podrán enviar predicciones hasta el {new Date(`${fechaLimite}T${horaLimite}`).toLocaleString('es-MX')}
+              </p>
+            )}
+          </div>
+
+          {/* Configuración */}
+          <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+            <h4 className="text-sm font-semibold text-gray-700 mb-3">Configuración</h4>
+
+            {/* Estado Activa */}
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm font-medium text-gray-700">Quiniela Activa</span>
+                <p className="text-xs text-gray-500">Permite que los usuarios accedan al formulario</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={activa}
+                  onChange={(e) => setActiva(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+              </label>
+            </div>
+
+            {/* Permitir Edición */}
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm font-medium text-gray-700">Permitir Edición de Predicciones</span>
+                <p className="text-xs text-gray-500">Los usuarios podrán modificar sus predicciones</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={permitirEdicion}
+                  onChange={(e) => setPermitirEdicion(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-500"></div>
+              </label>
+            </div>
+
+            {/* Mostrar Resultados */}
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm font-medium text-gray-700">Mostrar Resultados en Tiempo Real</span>
+                <p className="text-xs text-gray-500">Los usuarios verán las estadísticas de predicciones</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={mostrarResultados}
+                  onChange={(e) => setMostrarResultados(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+              </label>
+            </div>
           </div>
 
           {/* Partidos */}

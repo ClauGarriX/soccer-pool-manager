@@ -4,11 +4,11 @@ import { Home, Target, DollarSign, BarChart3, Settings, LogOut, X, Menu } from '
 
 const Sidebar = ({ isOpen, toggleSidebar, onLogout }) => {
   const menuItems = [
-    { icon: Home, label: 'Inicio', path: '/' },
-    { icon: Target, label: 'Quinielas', path: '/quinielas' },
-    { icon: DollarSign, label: 'Pagos', path: '/pagos' },
-    { icon: BarChart3, label: 'Estadísticas', path: '/estadisticas' },
-    { icon: Settings, label: 'Configuración', path: '/configuracion' }
+    { icon: Home, label: 'Inicio', path: '/admin' },
+    { icon: Target, label: 'Quinielas', path: '/admin/quinielas' },
+    { icon: DollarSign, label: 'Pagos', path: '/admin/pagos' },
+    { icon: BarChart3, label: 'Estadísticas', path: '/admin/estadisticas' },
+    { icon: Settings, label: 'Configuración', path: '/admin/configuracion' }
   ];
 
   return (
